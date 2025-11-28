@@ -42,7 +42,7 @@ void REPLRead(char arguments[10][100])
     while (argument != NULL)
     {
         argument[strcspn(argument, "\n")] = 0;
-        strncpy(arguments[x++], argument, sizeof(argument));
+        strncpy(arguments[x++], argument, sizeof(input));
         if (x >= 10)
         {
             break;
