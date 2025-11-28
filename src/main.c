@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
+void REPLRead(char *input, int sizeInput);
+int REPLEval(char *input);
+void REPLPrint(char *input);
+
 int main(int argc, char *argv[])
 {
     // Flush after every printf
@@ -8,18 +12,38 @@ int main(int argc, char *argv[])
 
     while(true)
     {
-        // TODO: Uncomment the code below to pass the first stage
-        printf("$ ");
+        char input[1000];
 
-        char input[100];
-        fgets(input, sizeof(input), stdin);
-        input[strcspn(input, "\n")] = 0;
-        if (strcmp(input, "exit") == 0) 
+        REPLRead(input, sizeof(input));
+
+        if (REPLEval(input) > 0)
         {
             break;
         }
-        printf("%s: command not found\n", input);
+
+        REPLPrint(input);
     }
 
     return 0;
+}
+
+void REPLRead(char *input, int sizeInput)
+{
+    printf("$ ");
+    fgets(input, sizeInput, stdin);
+}
+
+int REPLEval(char *input)
+{
+    input[strcspn(input, "\n")] = 0;
+    if (strcmp(input, "exit") == 0) 
+    {
+        return 1;
+    }
+    return 0;
+}
+
+void REPLPrint(char *input)
+{
+    printf("%s: command not found\n", input);
 }
