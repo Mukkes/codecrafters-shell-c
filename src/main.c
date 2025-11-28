@@ -2,8 +2,8 @@
 #include <string.h>
 
 void REPLRead(char arguments[10][100]);
-int REPLEval(char arguments[10][100]);
-void REPLPrint(char arguments[10][100]);
+int REPLEval(char arguments[10][100], char output[1000]);
+void REPLPrint(char output[1000]);
 
 int main(int argc, char *argv[])
 {
@@ -13,15 +13,17 @@ int main(int argc, char *argv[])
     while(true)
     {
         char arguments[10][100];
+        char output[1000];
+        memset(output, '\0', sizeof(output));
 
         REPLRead(arguments);
 
-        if (REPLEval(arguments) > 0)
+        if (REPLEval(arguments, output) > 0)
         {
             break;
         }
 
-        REPLPrint(arguments);
+        REPLPrint(output);
     }
 
     return 0;
@@ -40,7 +42,7 @@ void REPLRead(char arguments[10][100])
     while (argument != NULL)
     {
         argument[strcspn(argument, "\n")] = 0;
-        strncpy(arguments[x++], argument, 100);
+        strncpy(arguments[x++], argument, sizeof(argument));
         if (x >= 10)
         {
             break;
@@ -49,16 +51,32 @@ void REPLRead(char arguments[10][100])
     }
 }
 
-int REPLEval(char arguments[10][100])
+int REPLEval(char arguments[10][100], char output[1000])
 {
     if (strcmp(arguments[0], "exit") == 0) 
     {
         return 1;
     }
+    else if (strcmp(arguments[0], "echo") == 0)
+    {
+        for (int i = 1; i < 10; i++)
+        {
+            if (arguments[i][0] == '\0')
+            {
+                break;
+            }
+            strcat(output, arguments[i]);
+            strcat(output, " ");
+        }
+    }
+    else
+    {
+        snprintf(output, 1000, "%s: command not found", arguments[0]);
+    }
     return 0;
 }
 
-void REPLPrint(char arguments[10][100])
+void REPLPrint(char output[1000])
 {
-    printf("%s: command not found\n", arguments[0]);
+    printf("%s\n", output);
 }
