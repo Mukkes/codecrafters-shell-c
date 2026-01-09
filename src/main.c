@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     // Flush after every printf
     setbuf(stdout, NULL);
 
-    while(true)
+    while (true)
     {
         char arguments[10][100];
         char output[1000];
@@ -53,7 +53,7 @@ void REPLRead(char arguments[10][100])
 
 int REPLEval(char arguments[10][100], char output[1000])
 {
-    if (strcmp(arguments[0], "exit") == 0) 
+    if (strcmp(arguments[0], "exit") == 0)
     {
         return 1;
     }
@@ -67,6 +67,18 @@ int REPLEval(char arguments[10][100], char output[1000])
             }
             strcat(output, arguments[i]);
             strcat(output, " ");
+        }
+    }
+    else if (strcmp(arguments[0], "type") == 0)
+    {
+        if ((strcmp(arguments[1], "echo") == 0) || (strcmp(arguments[1], "exit") == 0) ||
+            (strcmp(arguments[1], "type") == 0))
+        {
+            snprintf(output, 1000, "%s is a shell builtin", arguments[1]);
+        }
+        else
+        {
+            snprintf(output, 1000, "%s: not found", arguments[1]);
         }
     }
     else
