@@ -1,3 +1,4 @@
+#include "Builtin.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -18,12 +19,21 @@ int main(int argc, char *argv[])
 
         REPLRead(arguments);
 
-        if (REPLEval(arguments, output) > 0)
+        if (IsBuiltin(arguments[0]))
         {
-            break;
+            RunBuiltin(arguments);
+        }
+        else
+        {
+            printf("%s: command not found\n", arguments[0]);
         }
 
-        REPLPrint(output);
+        // if (REPLEval(arguments, output) > 0)
+        //{
+        //     break;
+        // }
+
+        // REPLPrint(output);
     }
 
     return 0;
