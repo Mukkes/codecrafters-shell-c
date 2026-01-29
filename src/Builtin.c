@@ -7,7 +7,8 @@ void BuiltinExit(char[10][100]);
 void BuiltinEcho(char[10][100]);
 void BuiltinType(char[10][100]);
 
-static Builtin Builtins[] = {{"exit", BuiltinExit}, {"echo", BuiltinEcho}, {"type", BuiltinType}};
+static Builtin Builtins[] = {
+    {"exit", BuiltinExit}, {"echo", BuiltinEcho}, {"type", BuiltinType}};
 int BuiltinsLength = sizeof(Builtins) / sizeof(Builtin);
 
 void GetBuiltin(char argument[100], Builtin **builtin)
