@@ -2,13 +2,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 void BuiltinExit(char[10][100]);
 void BuiltinEcho(char[10][100]);
 void BuiltinType(char[10][100]);
+void BuiltinTest(char[10][100]);
 
-static Builtin Builtins[] = {
-    {"exit", BuiltinExit}, {"echo", BuiltinEcho}, {"type", BuiltinType}};
+static Builtin Builtins[] = {{"exit", BuiltinExit},
+                             {"echo", BuiltinEcho},
+                             {"type", BuiltinType},
+                             {"test", BuiltinTest}};
 int BuiltinsLength = sizeof(Builtins) / sizeof(Builtin);
 
 void GetBuiltin(char argument[100], Builtin **builtin)
@@ -59,15 +63,60 @@ void BuiltinEcho(char arguments[10][100])
     printf("\n");
 }
 
+bool IsExecutable(char argument[100])
+{
+    const char *pathValue = getenv("PATH");
+    int pathLenght = strlen(pathValue);
+    char copyPath[pathLenght + 1];
+    strncpy(copyPath, pathValue, pathLenght + 1);
+    char *path = strtok(copyPath, ":");
+    while (path != NULL)
+    {
+        // printf("%s\n", path);
+        char filePath[strlen(path) + strlen(argument) + 2];
+        strcpy(filePath, path);
+        strcat(filePath, "/");
+        strcat(filePath, argument);
+        struct stat buffer;
+        if (stat(filePath, &buffer) == 0 && buffer.st_mode & S_IXUSR)
+        {
+            // printf("%s\n", filePath);
+            printf("%s is %s", argument, filePath);
+            return true;
+        }
+        path = strtok(NULL, ":");
+    }
+    // printf("\n");
+    return false;
+}
+
 void BuiltinType(char arguments[10][100])
 {
     if (IsBuiltin(arguments[1]))
     {
         printf("%s is a shell builtin", arguments[1]);
     }
+    else if (IsExecutable(arguments[1]))
+    {
+    }
     else
     {
         printf("%s: not found", arguments[1]);
+    }
+    printf("\n");
+}
+
+void BuiltinTest(char arguments[10][100])
+{
+    const char *pathValue = getenv("PATH");
+    int pathLenght = strlen(pathValue);
+    char copyPath[pathLenght + 1];
+    strncpy(copyPath, pathValue, pathLenght + 1);
+    char *path = strtok(copyPath, ":");
+    while (path != NULL)
+    {
+        printf("%s\n", path);
+        path = strtok(NULL, ":");
     }
     printf("\n");
 }
