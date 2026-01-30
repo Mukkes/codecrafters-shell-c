@@ -9,5 +9,6 @@ typedef struct Builtin
 
 bool IsBuiltin(char argument[100]);
 void RunBuiltin(char arguments[10][100]);
+bool IsExecutable(char argument[100], char *filePath);
 
 #endif

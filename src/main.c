@@ -1,5 +1,6 @@
 #include "Builtin.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 void ReadArguments(char arguments[10][100]);
@@ -17,9 +18,23 @@ int main(int argc, char *argv[])
 
         ReadArguments(arguments);
 
+        char filePath[1150];
         if (IsBuiltin(arguments[0]))
         {
             RunBuiltin(arguments);
+        }
+        else if (IsExecutable(arguments[0], filePath))
+        {
+            for (int i = 1; i < 10; i++)
+            {
+                if (arguments[i][0] == '\0')
+                {
+                    break;
+                }
+                strcat(filePath, " ");
+                strcat(filePath, arguments[i]);
+            }
+            system(filePath);
         }
         else
         {

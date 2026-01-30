@@ -63,7 +63,7 @@ void BuiltinEcho(char arguments[10][100])
     printf("\n");
 }
 
-bool IsExecutable(char argument[100])
+bool IsExecutable(char argument[100], char *filePath)
 {
     const char *pathValue = getenv("PATH");
     int pathLenght = strlen(pathValue);
@@ -72,32 +72,29 @@ bool IsExecutable(char argument[100])
     char *path = strtok(copyPath, ":");
     while (path != NULL)
     {
-        // printf("%s\n", path);
-        char filePath[strlen(path) + strlen(argument) + 2];
         strcpy(filePath, path);
         strcat(filePath, "/");
         strcat(filePath, argument);
         struct stat buffer;
         if (stat(filePath, &buffer) == 0 && buffer.st_mode & S_IXUSR)
         {
-            // printf("%s\n", filePath);
-            printf("%s is %s", argument, filePath);
             return true;
         }
         path = strtok(NULL, ":");
     }
-    // printf("\n");
     return false;
 }
 
 void BuiltinType(char arguments[10][100])
 {
+    char filePath[150];
     if (IsBuiltin(arguments[1]))
     {
         printf("%s is a shell builtin", arguments[1]);
     }
-    else if (IsExecutable(arguments[1]))
+    else if (IsExecutable(arguments[1], filePath))
     {
+        printf("%s is %s", arguments[1], filePath);
     }
     else
     {
