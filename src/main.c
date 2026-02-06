@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 void ReadArguments(char arguments[10][100]);
 
@@ -19,22 +22,39 @@ int main(int argc, char *argv[])
         ReadArguments(arguments);
 
         char filePath[1150];
+        char *executableArguments[11];
         if (IsBuiltin(arguments[0]))
         {
             RunBuiltin(arguments);
         }
         else if (IsExecutable(arguments[0], filePath))
         {
-            for (int i = 1; i < 10; i++)
+            executableArguments[0] = arguments[0];
+            int i;
+            for (i = 1; i < 10; i++)
             {
                 if (arguments[i][0] == '\0')
                 {
                     break;
                 }
-                strcat(filePath, " ");
-                strcat(filePath, arguments[i]);
+                executableArguments[i] = arguments[i];
             }
-            system(filePath);
+            executableArguments[i] = NULL;
+            pid_t pid = fork();
+            if (pid == -1)
+            {
+                exit(0);
+            }
+            else if (pid > 0)
+            {
+                int status;
+                waitpid(pid, &status, 0);
+            }
+            else
+            {
+                execv(filePath, executableArguments);
+                exit(0);
+            }
         }
         else
         {
