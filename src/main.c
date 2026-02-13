@@ -43,7 +43,8 @@ int main(int argc, char *argv[])
             pid_t pid = fork();
             if (pid == -1)
             {
-                exit(0);
+                perror("fork");
+                exit(EXIT_FAILURE);
             }
             else if (pid > 0)
             {
@@ -52,7 +53,11 @@ int main(int argc, char *argv[])
             }
             else
             {
-                execv(filePath, executableArguments);
+                if (execv(filePath, executableArguments))
+                {
+                    perror(filePath);
+                    exit(127);
+                }
                 exit(0);
             }
         }
