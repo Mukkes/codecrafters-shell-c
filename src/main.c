@@ -1,3 +1,5 @@
+#include "Arguments.h"
+#define _GNU_SOURCE
 #include "Builtin.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,7 +8,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-void ReadArguments(char arguments[10][100]);
+void ReadArguments(Arguments *arguments);
 
 int main(int argc, char *argv[])
 {
@@ -15,29 +17,30 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        char arguments[10][100];
-        char output[1000];
-        memset(output, '\0', sizeof(output));
+        Arguments *arguments;
+        InitializeArguments(&arguments);
 
         ReadArguments(arguments);
 
+        if (arguments->count == 0)
+        {
+            DeleteArguments(&arguments);
+            continue;
+        }
+
         char filePath[1150];
         char *executableArguments[11];
-        if (IsBuiltin(arguments[0]))
+        if (IsBuiltin(arguments->values[0]))
         {
             RunBuiltin(arguments);
         }
-        else if (IsExecutable(arguments[0], filePath))
+        else if (IsExecutable(arguments->values[0], filePath))
         {
-            executableArguments[0] = arguments[0];
+            executableArguments[0] = arguments->values[0];
             int i;
-            for (i = 1; i < 10; i++)
+            for (i = 1; i < arguments->count; i++)
             {
-                if (arguments[i][0] == '\0')
-                {
-                    break;
-                }
-                executableArguments[i] = arguments[i];
+                executableArguments[i] = arguments->values[i];
             }
             executableArguments[i] = NULL;
             pid_t pid = fork();
@@ -63,31 +66,27 @@ int main(int argc, char *argv[])
         }
         else
         {
-            printf("%s: command not found\n", arguments[0]);
+            printf("%s: command not found\n", arguments->values[0]);
         }
+        DeleteArguments(&arguments);
     }
 
     return 0;
 }
 
-void ReadArguments(char arguments[10][100])
+void ReadArguments(Arguments *arguments)
 {
     char input[1000];
     char *argument;
-    int x = 0;
 
     printf("$ ");
     fgets(input, sizeof(input), stdin);
 
     argument = strtok(input, " ");
-    while (argument != NULL)
+    while (argument != NULL && strlen(argument) > 0 && argument[0] != '\n')
     {
         argument[strcspn(argument, "\n")] = 0;
-        strncpy(arguments[x++], argument, sizeof(input));
-        if (x >= 10)
-        {
-            break;
-        }
+        AddArgument(arguments, argument);
         argument = strtok(NULL, " ");
     }
 }

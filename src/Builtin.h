@@ -1,14 +1,15 @@
 #ifndef BUILTIN_H
 #define BUILTIN_H
 
+#include "Arguments.h"
 typedef struct Builtin
 {
     char *Name;
-    void (*Function)(char[10][100]);
+    void (*Function)(Arguments *arguments);
 } Builtin;
 
-bool IsBuiltin(char argument[100]);
-void RunBuiltin(char arguments[10][100]);
-bool IsExecutable(char argument[100], char *filePath);
+bool IsBuiltin(char *argument);
+void RunBuiltin(Arguments *arguments);
+bool IsExecutable(char *argument, char *filePath);
 
 #endif
