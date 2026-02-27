@@ -1,18 +1,22 @@
 #include "Builtin.h"
 #include "Arguments.h"
+#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 void BuiltinExit(Arguments *arguments);
 void BuiltinEcho(Arguments *arguments);
 void BuiltinType(Arguments *arguments);
+void BuiltinPwd(Arguments *arguments);
 void BuiltinTest(Arguments *arguments);
 
 static Builtin Builtins[] = {{"exit", BuiltinExit},
                              {"echo", BuiltinEcho},
                              {"type", BuiltinType},
+                             {"pwd", BuiltinPwd},
                              {"test", BuiltinTest}};
 int BuiltinsLength = sizeof(Builtins) / sizeof(Builtin);
 
@@ -98,6 +102,19 @@ void BuiltinType(Arguments *arguments)
         printf("%s: not found", arguments->values[1]);
     }
     printf("\n");
+}
+
+void BuiltinPwd(Arguments *arguments)
+{
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+    {
+        printf("%s\n", cwd);
+    }
+    else
+    {
+        exit(1);
+    }
 }
 
 void BuiltinTest(Arguments *arguments)
