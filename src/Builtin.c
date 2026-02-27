@@ -1,13 +1,14 @@
 #include "Builtin.h"
+#include "Arguments.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
-void BuiltinExit(char[10][100]);
-void BuiltinEcho(char[10][100]);
-void BuiltinType(char[10][100]);
-void BuiltinTest(char[10][100]);
+void BuiltinExit(Arguments *arguments);
+void BuiltinEcho(Arguments *arguments);
+void BuiltinType(Arguments *arguments);
+void BuiltinTest(Arguments *arguments);
 
 static Builtin Builtins[] = {{"exit", BuiltinExit},
                              {"echo", BuiltinEcho},
@@ -15,7 +16,7 @@ static Builtin Builtins[] = {{"exit", BuiltinExit},
                              {"test", BuiltinTest}};
 int BuiltinsLength = sizeof(Builtins) / sizeof(Builtin);
 
-void GetBuiltin(char argument[100], Builtin **builtin)
+void GetBuiltin(char *argument, Builtin **builtin)
 {
     for (int i = 0; i < BuiltinsLength; i++)
     {
@@ -27,43 +28,39 @@ void GetBuiltin(char argument[100], Builtin **builtin)
     }
 }
 
-bool IsBuiltin(char argument[100])
+bool IsBuiltin(char *argument)
 {
     Builtin *builtin = NULL;
     GetBuiltin(argument, &builtin);
     return builtin != NULL;
 }
 
-void RunBuiltin(char arguments[10][100])
+void RunBuiltin(Arguments *arguments)
 {
     Builtin *builtin = NULL;
-    GetBuiltin(arguments[0], &builtin);
+    GetBuiltin(arguments->values[0], &builtin);
     if (builtin != NULL)
     {
         builtin->Function(arguments);
     }
 }
 
-void BuiltinExit(char arguments[10][100])
+void BuiltinExit(Arguments *arguments)
 {
     exit(0);
 }
 
-void BuiltinEcho(char arguments[10][100])
+void BuiltinEcho(Arguments *arguments)
 {
-    for (int i = 1; i < 10; i++)
+    for (int i = 1; i < arguments->count; i++)
     {
-        if (arguments[i][0] == '\0')
-        {
-            break;
-        }
-        printf("%s", arguments[i]);
+        printf("%s", arguments->values[i]);
         printf(" ");
     }
     printf("\n");
 }
 
-bool IsExecutable(char argument[100], char *filePath)
+bool IsExecutable(char *argument, char *filePath)
 {
     const char *pathValue = getenv("PATH");
     int pathLenght = strlen(pathValue);
@@ -85,25 +82,25 @@ bool IsExecutable(char argument[100], char *filePath)
     return false;
 }
 
-void BuiltinType(char arguments[10][100])
+void BuiltinType(Arguments *arguments)
 {
     char filePath[150];
-    if (IsBuiltin(arguments[1]))
+    if (IsBuiltin(arguments->values[1]))
     {
-        printf("%s is a shell builtin", arguments[1]);
+        printf("%s is a shell builtin", arguments->values[1]);
     }
-    else if (IsExecutable(arguments[1], filePath))
+    else if (IsExecutable(arguments->values[1], filePath))
     {
-        printf("%s is %s", arguments[1], filePath);
+        printf("%s is %s", arguments->values[1], filePath);
     }
     else
     {
-        printf("%s: not found", arguments[1]);
+        printf("%s: not found", arguments->values[1]);
     }
     printf("\n");
 }
 
-void BuiltinTest(char arguments[10][100])
+void BuiltinTest(Arguments *arguments)
 {
     const char *pathValue = getenv("PATH");
     int pathLenght = strlen(pathValue);
