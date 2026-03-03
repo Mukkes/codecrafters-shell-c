@@ -29,20 +29,12 @@ int main(int argc, char *argv[])
         }
 
         char filePath[1150];
-        char *executableArguments[11];
         if (IsBuiltin(arguments->values[0]))
         {
             RunBuiltin(arguments);
         }
         else if (IsExecutable(arguments->values[0], filePath))
         {
-            executableArguments[0] = arguments->values[0];
-            int i;
-            for (i = 1; i < arguments->count; i++)
-            {
-                executableArguments[i] = arguments->values[i];
-            }
-            executableArguments[i] = NULL;
             pid_t pid = fork();
             if (pid == -1)
             {
@@ -56,7 +48,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                if (execv(filePath, executableArguments))
+                if (execv(filePath, arguments->values))
                 {
                     perror(filePath);
                     exit(127);
