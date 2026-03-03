@@ -18,12 +18,12 @@ void AddArgument(Arguments *arguments, char *value)
     void *valuesPointer;
     if (arguments->count == 0)
     {
-        valuesPointer = malloc(sizeof(char *));
+        valuesPointer = malloc(sizeof(char *) * 2);
     }
     else
     {
         valuesPointer =
-            realloc(arguments->values, sizeof(char *) * (arguments->count + 1));
+            realloc(arguments->values, sizeof(char *) * (arguments->count + 2));
     }
 
     if (valuesPointer == NULL)
@@ -34,9 +34,15 @@ void AddArgument(Arguments *arguments, char *value)
 
     int valueLenght = strlen(value);
     char *argumentPointer = malloc(sizeof(char) * (valueLenght + 1));
+    if (argumentPointer == NULL)
+    {
+        exit(1);
+    }
     arguments->values[arguments->count] = argumentPointer;
+
     strncpy(arguments->values[arguments->count], value, valueLenght);
     arguments->values[arguments->count][valueLenght] = '\0';
+    arguments->values[arguments->count + 1] = NULL;
     arguments->count++;
 }
 
