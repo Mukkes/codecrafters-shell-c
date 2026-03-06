@@ -1,5 +1,7 @@
 #include "Builtin.h"
 #include "Arguments.h"
+#include <asm-generic/errno-base.h>
+#include <errno.h>
 #include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,13 +13,12 @@ void BuiltinExit(Arguments *arguments);
 void BuiltinEcho(Arguments *arguments);
 void BuiltinType(Arguments *arguments);
 void BuiltinPwd(Arguments *arguments);
+void BuiltinCd(Arguments *arguments);
 void BuiltinTest(Arguments *arguments);
 
-static Builtin Builtins[] = {{"exit", BuiltinExit},
-                             {"echo", BuiltinEcho},
-                             {"type", BuiltinType},
-                             {"pwd", BuiltinPwd},
-                             {"test", BuiltinTest}};
+static Builtin Builtins[] = {{"exit", BuiltinExit}, {"echo", BuiltinEcho},
+                             {"type", BuiltinType}, {"pwd", BuiltinPwd},
+                             {"cd", BuiltinCd},     {"test", BuiltinTest}};
 int BuiltinsLength = sizeof(Builtins) / sizeof(Builtin);
 
 void GetBuiltin(char *argument, Builtin **builtin)
@@ -110,6 +111,28 @@ void BuiltinPwd(Arguments *arguments)
     if (getcwd(cwd, sizeof(cwd)) != NULL)
     {
         printf("%s\n", cwd);
+    }
+    else
+    {
+        exit(1);
+    }
+}
+
+void BuiltinCd(Arguments *arguments)
+{
+    int result = chdir(arguments->values[1]);
+    if (result == 0)
+    {
+        printf("%s\n", arguments->values[1]);
+        return;
+    }
+    if (errno == ENOENT)
+    {
+        printf("cd: %s: No such file or directory\n", arguments->values[1]);
+    }
+    else if (errno == ENOTDIR)
+    {
+        printf("cd: %s Not a directory\n", arguments->values[1]);
     }
     else
     {
