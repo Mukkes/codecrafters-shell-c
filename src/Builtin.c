@@ -120,18 +120,23 @@ void BuiltinPwd(Arguments *arguments)
 
 void BuiltinCd(Arguments *arguments)
 {
-    int result = chdir(arguments->values[1]);
+    char *path = arguments->values[1];
+    if (strcmp(path, "~") == 0)
+    {
+        path = getenv("HOME");
+    }
+    int result = chdir(path);
     if (result == 0)
     {
         return;
     }
     if (errno == ENOENT)
     {
-        printf("cd: %s: No such file or directory\n", arguments->values[1]);
+        printf("cd: %s: No such file or directory\n", path);
     }
     else if (errno == ENOTDIR)
     {
-        printf("cd: %s Not a directory\n", arguments->values[1]);
+        printf("cd: %s Not a directory\n", path);
     }
     else
     {
