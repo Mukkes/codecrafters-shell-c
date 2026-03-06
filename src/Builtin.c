@@ -123,7 +123,6 @@ void BuiltinCd(Arguments *arguments)
     int result = chdir(arguments->values[1]);
     if (result == 0)
     {
-        printf("%s\n", arguments->values[1]);
         return;
     }
     if (errno == ENOENT)
