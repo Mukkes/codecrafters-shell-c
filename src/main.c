@@ -121,6 +121,10 @@ void ReadArguments(Arguments *arguments)
                 argument[argumentIndex + 1] = 0;
             }
         }
+        else if (input[i] == '\\' && !isInsideSingleQuotes)
+        {
+            previousWasBackslash = true;
+        }
         else if (input[i] == '\'' && !isInsideDoubleQuotes)
         {
             isInsideSingleQuotes = !isInsideSingleQuotes;
@@ -128,10 +132,6 @@ void ReadArguments(Arguments *arguments)
         else if (input[i] == '\"' && !isInsideSingleQuotes)
         {
             isInsideDoubleQuotes = !isInsideDoubleQuotes;
-        }
-        else if (input[i] == '\\')
-        {
-            previousWasBackslash = true;
         }
         else
         {
