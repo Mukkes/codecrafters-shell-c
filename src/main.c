@@ -68,17 +68,59 @@ int main(int argc, char *argv[])
 
 void ReadArguments(Arguments *arguments)
 {
-    char input[1000];
-    char *argument;
+    char *input = NULL;
+    size_t inputSize = 0;
+    ssize_t numberRead;
 
     printf("$ ");
-    fgets(input, sizeof(input), stdin);
-
-    argument = strtok(input, " ");
-    while (argument != NULL && strlen(argument) > 0 && argument[0] != '\n')
+    numberRead = getline(&input, &inputSize, stdin);
+    if (numberRead < 0)
     {
-        argument[strcspn(argument, "\n")] = 0;
-        AddArgument(arguments, argument);
-        argument = strtok(NULL, " ");
+        free(input);
+        exit(1);
     }
+
+    size_t argumentSize = 2;
+    size_t argumentIndex = 0;
+    char *argument = malloc(sizeof(char) * argumentSize);
+    for (int i = 0; i < numberRead; i++)
+    {
+        if (argumentIndex + 1 >= argumentSize)
+        {
+            argumentSize *= 2;
+            char *newArgument = realloc(argument, sizeof(char) * argumentSize);
+            if (newArgument == NULL)
+            {
+                // Should free input. Better error handling? Return error?
+                exit(1);
+            }
+            argument = newArgument;
+        }
+
+        if (input[i] == ' ')
+        {
+            if (argumentIndex > 0)
+            {
+                AddArgument(arguments, argument);
+                argumentIndex = 0;
+                argument[argumentIndex + 1] = 0;
+            }
+        }
+        else if (input[i] == '\n')
+        {
+            break;
+        }
+        else
+        {
+            argument[argumentIndex] = input[i];
+            argument[argumentIndex + 1] = 0;
+            argumentIndex++;
+        }
+    }
+    if (argumentIndex > 0)
+    {
+        AddArgument(arguments, argument);
+    }
+    free(argument);
+    free(input);
 }
