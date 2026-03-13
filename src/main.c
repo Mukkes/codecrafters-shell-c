@@ -85,6 +85,7 @@ void ReadArguments(Arguments *arguments)
     char *argument = malloc(sizeof(char) * argumentSize);
     bool isInsideSingleQuotes = false;
     bool isInsideDoubleQuotes = false;
+    bool previousWasBackslash = false;
     for (int i = 0; i < numberRead; i++)
     {
         if (argumentIndex + 1 >= argumentSize)
@@ -99,7 +100,19 @@ void ReadArguments(Arguments *arguments)
             argument = newArgument;
         }
 
-        if (input[i] == ' ' && !isInsideSingleQuotes && !isInsideDoubleQuotes)
+        if (input[i] == '\n')
+        {
+            break;
+        }
+        else if (previousWasBackslash)
+        {
+            previousWasBackslash = false;
+            argument[argumentIndex] = input[i];
+            argument[argumentIndex + 1] = 0;
+            argumentIndex++;
+        }
+        else if (input[i] == ' ' && !isInsideSingleQuotes &&
+                 !isInsideDoubleQuotes)
         {
             if (argumentIndex > 0)
             {
@@ -108,10 +121,6 @@ void ReadArguments(Arguments *arguments)
                 argument[argumentIndex + 1] = 0;
             }
         }
-        else if (input[i] == '\n')
-        {
-            break;
-        }
         else if (input[i] == '\'' && !isInsideDoubleQuotes)
         {
             isInsideSingleQuotes = !isInsideSingleQuotes;
@@ -119,6 +128,10 @@ void ReadArguments(Arguments *arguments)
         else if (input[i] == '\"' && !isInsideSingleQuotes)
         {
             isInsideDoubleQuotes = !isInsideDoubleQuotes;
+        }
+        else if (input[i] == '\\')
+        {
+            previousWasBackslash = true;
         }
         else
         {
