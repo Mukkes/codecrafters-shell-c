@@ -83,6 +83,7 @@ void ReadArguments(Arguments *arguments)
     size_t argumentSize = 2;
     size_t argumentIndex = 0;
     char *argument = malloc(sizeof(char) * argumentSize);
+    bool isInsideSingleQuotes = false;
     for (int i = 0; i < numberRead; i++)
     {
         if (argumentIndex + 1 >= argumentSize)
@@ -97,7 +98,7 @@ void ReadArguments(Arguments *arguments)
             argument = newArgument;
         }
 
-        if (input[i] == ' ')
+        if (input[i] == ' ' && !isInsideSingleQuotes)
         {
             if (argumentIndex > 0)
             {
@@ -109,6 +110,10 @@ void ReadArguments(Arguments *arguments)
         else if (input[i] == '\n')
         {
             break;
+        }
+        else if (input[i] == '\'')
+        {
+            isInsideSingleQuotes = !isInsideSingleQuotes;
         }
         else
         {
