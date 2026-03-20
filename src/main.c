@@ -9,6 +9,9 @@
 #include <unistd.h>
 
 void ReadArguments(Arguments *arguments);
+void HandleRedirect(Arguments *arguments);
+
+static FILE *output = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -21,6 +24,7 @@ int main(int argc, char *argv[])
         InitializeArguments(&arguments);
 
         ReadArguments(arguments);
+        HandleRedirect(arguments);
 
         if (arguments->count == 0)
         {
@@ -60,6 +64,13 @@ int main(int argc, char *argv[])
         {
             printf("%s: command not found\n", arguments->values[0]);
         }
+
+        if (output != NULL)
+        {
+            fclose(output);
+            freopen("/dev/tty", "w", stdout);
+        }
+
         DeleteArguments(&arguments);
     }
 
@@ -146,4 +157,23 @@ void ReadArguments(Arguments *arguments)
     }
     free(argument);
     free(input);
+}
+
+void HandleRedirect(Arguments *arguments)
+{
+    for (size_t i = 0; i < arguments->count; i++)
+    {
+        if (strcmp(arguments->values[i], ">") == 0 ||
+            strcmp(arguments->values[i], "1>") == 0)
+        {
+            output = freopen(arguments->values[i + 1], "w", stdout);
+            if (output == NULL)
+            {
+                exit(1);
+            }
+
+            DeleteArgument(arguments, i + 1);
+            DeleteArgument(arguments, i);
+        }
+    }
 }

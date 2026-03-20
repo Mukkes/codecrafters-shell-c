@@ -58,3 +58,22 @@ void DeleteArguments(Arguments **arguments)
     free(*arguments);
     *arguments = NULL;
 }
+
+void DeleteArgument(Arguments *arguments, size_t index)
+{
+    if (index >= arguments->count)
+    {
+        exit(1);
+    }
+
+    free(arguments->values[index]);
+    arguments->values[index] = NULL;
+
+    for (size_t i = index; i < arguments->count; i++)
+    {
+        arguments->values[i] = arguments->values[i + 1];
+    }
+
+    arguments->values[arguments->count] = NULL;
+    arguments->count--;
+}
