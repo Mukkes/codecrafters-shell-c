@@ -186,5 +186,17 @@ void HandleRedirect(Arguments *arguments)
             DeleteArgument(arguments, i + 1);
             DeleteArgument(arguments, i);
         }
+        else if (strcmp(arguments->values[i], ">>") == 0 ||
+                 strcmp(arguments->values[i], "1>>") == 0)
+        {
+            output = freopen(arguments->values[i + 1], "a", stdout);
+            if (output == NULL)
+            {
+                exit(1);
+            }
+
+            DeleteArgument(arguments, i + 1);
+            DeleteArgument(arguments, i);
+        }
     }
 }
