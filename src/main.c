@@ -163,40 +163,43 @@ void HandleRedirect(Arguments *arguments)
 {
     for (size_t i = 0; i < arguments->count; i++)
     {
+        char *mode;
+        FILE *stream;
+
         if (strcmp(arguments->values[i], ">") == 0 ||
             strcmp(arguments->values[i], "1>") == 0)
         {
-            output = freopen(arguments->values[i + 1], "w", stdout);
-            if (output == NULL)
-            {
-                exit(1);
-            }
-
-            DeleteArgument(arguments, i + 1);
-            DeleteArgument(arguments, i);
+            mode = "w";
+            stream = stdout;
         }
         else if (strcmp(arguments->values[i], "2>") == 0)
         {
-            output = freopen(arguments->values[i + 1], "w", stderr);
-            if (output == NULL)
-            {
-                exit(1);
-            }
-
-            DeleteArgument(arguments, i + 1);
-            DeleteArgument(arguments, i);
+            mode = "w";
+            stream = stderr;
         }
         else if (strcmp(arguments->values[i], ">>") == 0 ||
                  strcmp(arguments->values[i], "1>>") == 0)
         {
-            output = freopen(arguments->values[i + 1], "a", stdout);
-            if (output == NULL)
-            {
-                exit(1);
-            }
-
-            DeleteArgument(arguments, i + 1);
-            DeleteArgument(arguments, i);
+            mode = "a";
+            stream = stdout;
         }
+        else if (strcmp(arguments->values[i], "2>>") == 0)
+        {
+            mode = "a";
+            stream = stderr;
+        }
+        else
+        {
+            continue;
+        }
+
+        output = freopen(arguments->values[i + 1], mode, stream);
+        if (output == NULL)
+        {
+            exit(1);
+        }
+
+        DeleteArgument(arguments, i + 1);
+        DeleteArgument(arguments, i);
     }
 }
